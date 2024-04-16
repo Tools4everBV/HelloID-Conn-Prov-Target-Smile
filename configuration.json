@@ -1,0 +1,44 @@
+[
+  {
+    "key": "BaseUrl",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "label": "BaseUrl",
+      "description": "The URL to the API.",
+      "required": true
+    }
+  },
+  {
+    "key": "EnvGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "label": "EnvGUID",
+      "description": "The EnvGUID to connect to the API",
+      "required": true
+    }
+  },
+  {
+    "key": "WebhookGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "WebhookGUID",
+      "description": "The WebhookGUID to connect to the API",
+      "required": true
+    }
+  },
+  {
+    "key": "TenantGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "Password",
+      "description": "The TenantGUID to connect to the API",
+      "required": true
+    }
+  }
+]
