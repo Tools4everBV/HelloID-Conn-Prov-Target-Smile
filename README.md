@@ -92,7 +92,7 @@ The _update_ lifecycle action compares the desired account specified in the fiel
 > [!WARNING]
 > Changing the value of this field will result in the account always being updated.
 
-Note that the fieldMapping contains an extra property called `SystemName`. This property is used to loop through the `$PersonContext.Person.Accounts` and filter on the _Smile_ system. The property is send to the _Smile_ webhook within the create and update actions. However, because _Smile_ won't do anything with additional properties and the request also won't fail if the body contains properties unknown to _Smile_.
+Note that the fieldMapping contains an extra property called `SystemName`. This property is used to loop through the `$PersonContext.Person.Accounts` and filter on the _Smile_ system. The property is send to the _Smile_ webhook within the create and update actions. However, additional properties in the request body that are unknown to _Smile_ are not being handled by the WebHook.
 
 #### `POST` calls only
 
