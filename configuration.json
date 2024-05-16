@@ -14,6 +14,7 @@
     "type": "input",
     "defaultValue": "",
     "templateOptions": {
+      "type": "password",
       "label": "EnvGUID",
       "description": "The EnvGUID to connect to the API",
       "required": true
@@ -36,7 +37,7 @@
     "defaultValue": "",
     "templateOptions": {
       "type": "password",
-      "label": "Password",
+      "label": "TenantGUID",
       "description": "The TenantGUID to connect to the API",
       "required": true
     }
