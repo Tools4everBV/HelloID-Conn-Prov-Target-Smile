@@ -20,8 +20,6 @@
     - [Remarks](#remarks)
       - [No validation if the user account exists](#no-validation-if-the-user-account-exists)
       - [Minimal error handling within the webhook](#minimal-error-handling-within-the-webhook)
-      - [Field mapping values are stored within the account data](#field-mapping-values-are-stored-within-the-account-data)
-      - [`SystemName` property](#systemname-property)
       - [`POST` calls only](#post-calls-only)
   - [Getting help](#getting-help)
   - [HelloID docs](#helloid-docs)
@@ -39,7 +37,7 @@ The following resources are available:
 | disable.ps1        | PowerShell _disable_ lifecycle action |
 | enable.ps1         | PowerShell _enable_ lifecycle action  |
 | configuration.json | Default _configuration_               |
-| fieldMapping.json  | Default _fieldMapping_                |
+| fieldMapping.json  | Default _fieldMapping                 |
 
 ## Getting started
 
@@ -80,19 +78,6 @@ Because there's no way to validate the existence of an account within _Smile_, t
 #### Minimal error handling within the webhook
 
 The webhook does not return any error information. If something fails, you will only receive a generic HTTP error code.
-
-#### Field mapping values are stored within the account data
-
-Since the _Smile_ webhook does not provide an _HTTP.GET_ we are unable to retrieve the current state of the _Smile_ account. We therefore store each field mapping value within the `$PersonContext.Person.Accounts`.
-
-The _update_ lifecycle action compares the desired account specified in the fieldMapping or `$actionContext.Data` and the currentAccount as specified in the `$PersonContext.Person.Accounts`. In case the value of one of the properties has changed, the _Smile_ account will be updated.
-
-#### `SystemName` property
-
-> [!WARNING]
-> Changing the value of this field will result in the account always being updated.
-
-Note that the fieldMapping contains an extra property called `SystemName`. This property is used to loop through the `$PersonContext.Person.Accounts` and filter on the _Smile_ system. The property is send to the _Smile_ webhook within the create and update actions. However, additional properties in the request body that are unknown to _Smile_ are not being handled by the WebHook.
 
 #### `POST` calls only
 
