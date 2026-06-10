@@ -1,12 +1,4 @@
 {
-    "FirstName": "John",
-    "LastName": "Doe",
-    "Department": "IT",
-    "Title": "IT Administrator",
-    "PhoneNumber": null,
-    "EmployeeNumber": "999999",
-    "Email": "john.doe@example.com",
-    "Username": "john.doe@example.com",
-    "Archived": "false",
-    "Active": "false"
+    "TitleCode": "ITADM",
+    "TitleName": "IT Administrator"
 }
