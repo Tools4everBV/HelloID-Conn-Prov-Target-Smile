@@ -1,48 +1,117 @@
-#################################################
+########################################################################
 # HelloID-Conn-Prov-Target-Smile-Enable
 # PowerShell V2
-#################################################
+# Note: Smile webhook differences compared to other APIs:
+# - No OAuth token authentication needed (only webhook URL with GUIDs)
+# - No HTTP.GET available: cannot check if account exists
+# - Enable action is an update (sets Active=true, Archived=false)
+# - Minimal error handling: webhook only returns generic HTTP errors
+# - EmployeeNumber NOT mapped for Enable: prevents duplicates when source value changes
+#   Script adds EmployeeNumber from AccountReference to ensure correct account is updated
+#   Consequence: updating EmployeeNumber is not possible (would create new account in Smile)
+######################################################
 
 # Enable TLS1.2
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
 
-try {
-    # Verify if [aRef] has a value
-    if ([string]::IsNullOrEmpty($($actionContext.References.Account))) {
-        throw 'The account reference could not be found'
-    }
-
-    # Add a message and the result of each of the validations showing what will happen during enforcement
-    if ($actionContext.DryRun -eq $true) {
-        Write-Information "[DryRun] 'Enable account will be executed during enforcement"
-    }
-
-    # Process
-    if (-not($actionContext.DryRun -eq $true)) {
-        $body = $actionContext.Data | ConvertTo-Json
-        $splatRestParams = @{
-            Uri     = "$($actionContext.configuration.BaseUrl)/api/webhook/$($actionContext.configuration.EnvGUID)/employee/$($actionContext.configuration.WebhookGUID)/$($actionContext.configuration.TenantGUID)"
-            Headers = @{
-                'Content-Type' = 'application/json;charset=utf-8'
-            }
-            Body   = ([System.Text.Encoding]::UTF8.GetBytes($body))
-            Method = 'POST'
+#region functions
+function Resolve-SmileError {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [object]
+        $ErrorObject
+    )
+    process {
+        $httpErrorObj = [PSCustomObject]@{
+            ScriptLineNumber = $ErrorObject.InvocationInfo.ScriptLineNumber
+            Line             = $ErrorObject.InvocationInfo.Line
+            ErrorDetails     = $ErrorObject.Exception.Message
+            FriendlyMessage  = $ErrorObject.Exception.Message
         }
-        $null = Invoke-WebRequest @splatRestParams -Verbose:$false
-        $outputContext.success = $true
+        if (-not [string]::IsNullOrEmpty($ErrorObject.ErrorDetails.Message)) {
+            $httpErrorObj.ErrorDetails = $ErrorObject.ErrorDetails.Message
+        }
+        elseif ($ErrorObject.Exception.GetType().FullName -eq 'System.Net.WebException') {
+            if ($null -ne $ErrorObject.Exception.Response) {
+                $streamReaderResponse = [System.IO.StreamReader]::new($ErrorObject.Exception.Response.GetResponseStream()).ReadToEnd()
+                if (-not [string]::IsNullOrEmpty($streamReaderResponse)) {
+                    $httpErrorObj.ErrorDetails = $streamReaderResponse
+                }
+            }
+        }
+        try {
+            $errorDetailsObject = ($httpErrorObj.ErrorDetails | ConvertFrom-Json)
+            # Make sure to inspect the error result object and add only the error message as a FriendlyMessage.
+            # $httpErrorObj.FriendlyMessage = $errorDetailsObject.message
+            $httpErrorObj.FriendlyMessage = $httpErrorObj.ErrorDetails # Temporarily assignment
+        }
+        catch {
+            $httpErrorObj.FriendlyMessage = $httpErrorObj.ErrorDetails
+            Write-Warning $_.Exception.Message
+        }
+        Write-Output $httpErrorObj
+    }
+}
+#endregion functions
+
+try {
+    # Add EmployeeNumber from AccountReference to body (needed for Smile to identify the account)
+    # EmployeeNumber should NOT be mapped in fieldMapping for Enable to prevent duplicates when source value changes
+    $actionContext.Data | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
+    
+    # Process
+    $actionMessage = "enabling account with AccountReference [$($actionContext.References.Account)]"
+
+    $enableAccountBody = $actionContext.Data
+
+    $enableAccountSplatParams = @{
+        Uri         = "$($actionContext.configuration.BaseUrl)/api/webhook/$($actionContext.configuration.EnvGUID)/employee/$($actionContext.configuration.WebhookGUID)/$($actionContext.configuration.TenantGUID)"
+        Method      = 'POST'
+        Headers     = @{
+            'Content-Type' = 'application/json;charset=utf-8'
+        }
+        Body        = ([System.Text.Encoding]::UTF8.GetBytes(($enableAccountBody | ConvertTo-Json -Depth 10)))
+        ContentType = "application/json;charset=utf-8"
+        Verbose     = $false
+        ErrorAction = "Stop"
+    }
+
+    if (-Not($actionContext.DryRun -eq $true)) {
+        $enableAccountResponse = Invoke-RestMethod @enableAccountSplatParams
+
+        # Note: Smile webhook returns no data, so we return the mapped fields as output
+        $outputContext.Data = $actionContext.Data
+
         $outputContext.AuditLogs.Add([PSCustomObject]@{
-                Action  = 'EnableAccount'
-                Message = "Enable account was successful"
+                Action  = "EnableAccount"
+                Message = "Enabled account with AccountReference [$($actionContext.References.Account)]."
                 IsError = $false
             })
     }
-} catch {
-    $outputContext.success = $false
+    else {
+        Write-Information "[DryRun] Would enable account with AccountReference [$($actionContext.References.Account)]"
+    }
+
+    $outputContext.Success = $true
+}
+catch {
+    $outputContext.Success = $false
     $ex = $PSItem
-    $auditMessage = "Could not enable Smile account. Error: $($_.Exception.Message)"
-    Write-Warning "Error at Line '$($ex.InvocationInfo.ScriptLineNumber)': $($ex.InvocationInfo.Line). Error: $($ex.Exception.Message)"
+    if ($($ex.Exception.GetType().FullName -eq "Microsoft.PowerShell.Commands.HttpResponseException") -or
+        $($ex.Exception.GetType().FullName -eq "System.Net.WebException")) {
+        $errorObj = Resolve-SmileError -ErrorObject $ex
+        $warningMessage = "Error at Line '$($errorObj.ScriptLineNumber)': $($errorObj.Line). Error: $($errorObj.ErrorDetails)"
+        $errorMessage = "Error $($actionMessage). Error: $($errorObj.FriendlyMessage)"
+    }
+    else {
+        $warningMessage = "Error at Line '$($ex.InvocationInfo.ScriptLineNumber)': $($ex.InvocationInfo.Line). Error: $($ex.Exception.Message)"
+        $errorMessage = "Error $($actionMessage). Error: $($ex.Exception.Message)"
+    }
+    Write-Warning $warningMessage
+
     $outputContext.AuditLogs.Add([PSCustomObject]@{
-        Message = $auditMessage
-        IsError = $true
-    })
+            Message = $errorMessage
+            IsError = $true
+        })
 }
