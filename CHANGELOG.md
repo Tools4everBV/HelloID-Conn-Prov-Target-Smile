@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file. The format 
 - Refactored all lifecycle scripts (create.ps1, update.ps1, enable.ps1, disable.ps1, delete.ps1) with improved error handling and logging
 - Enhanced update.ps1 to automatically add EmployeeNumber from AccountReference to prevent duplicates when source EmployeeNumber changes
 - Updated fieldMapping.json to include new fields and ensure proper mapping for account attributes
+- Enhanced LastName field mapping to use complex JavaScript logic supporting multiple naming conventions (B, BP, P, PB) with partner name combinations
 - Completely rewrote README.md with extensive documentation including:
   - Supported features overview with detailed feature matrix
   - Step-by-step setup guide for Smile configuration
