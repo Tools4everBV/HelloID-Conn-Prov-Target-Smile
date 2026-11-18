@@ -7,6 +7,16 @@
   <img src="https://raw.githubusercontent.com/Tools4everBV/HelloID-Conn-Prov-Target-Smile/refs/heads/main/Logo.png">
 </p>
 
+> [!WARNING]
+> The Smile webhook only accepts POST requests and returns no data. Keep the following in mind:
+>
+> - Nothing can be read back: no correlation and no import, see [No HTTP.GET available](#no-httpget-available)
+> - Errors are generic, so verify the result in Smile, see [The webhook returns no error details](#the-webhook-returns-no-error-details)
+> - EmployeeNumber is the identifier and is mapped for Create only, see [EmployeeNumber handling](#employeenumber-handling)
+> - Delete only empties Email and Username, see [Delete behavior](#delete-behavior)
+>
+> Read the [Remarks](#remarks) carefully and test in the Smile acceptance environment first.
+
 ## Table of contents
 
 - [HelloID-Conn-Prov-Target-Smile](#helloid-conn-prov-target-smile)
@@ -26,13 +36,17 @@
   - [Remarks](#remarks)
     - [No HTTP.GET available](#no-httpget-available)
     - [The webhook returns no error details](#the-webhook-returns-no-error-details)
+    - [Create behavior](#create-behavior)
+    - [Update behavior](#update-behavior)
+    - [Enable and disable behavior](#enable-and-disable-behavior)
     - [Departments and titles are not checked or maintained](#departments-and-titles-are-not-checked-or-maintained)
     - [EmployeeNumber handling](#employeenumber-handling)
-    - [No delete endpoint](#no-delete-endpoint)
+    - [Delete behavior](#delete-behavior)
     - [Testing JSON before go-live](#testing-json-before-go-live)
   - [Development resources](#development-resources)
     - [Webhook endpoints](#webhook-endpoints)
     - [API documentation](#api-documentation)
+    - [Script conventions](#script-conventions)
   - [Getting help](#getting-help)
   - [HelloID docs](#helloid-docs)
 
@@ -44,12 +58,14 @@ HelloID-Conn-Prov-Target-Smile is a _target_ connector. Smile provides a webhook
 
 The following features are available:
 
+✅ = implemented, ✅⚠️ = implemented with limitations, ❌ = not implemented. See the [Remarks](#remarks).
+
 | Feature                        | Supported | Actions                                    | Remarks                                    |
 | ------------------------------ | --------- | ------------------------------------------ | ------------------------------------------ |
-| Account Lifecycle              | ✅         | Create, Update, Enable, Disable, Delete    | See [Account Lifecycle Actions](#account-lifecycle-actions) |
+| Account Lifecycle              | ✅⚠️       | Create, Update, Enable, Disable, Delete    | No delete endpoint, see [Account Lifecycle Actions](#account-lifecycle-actions) |
 | Correlation                    | ❌         | N/A                                        | Not possible (see [Remarks](#remarks))     |
 | Permissions                    | ❌         | N/A                                        | Not available                              |
-| Resources                      | ✅         | Create/Update                              | Departments, Titles. Optional: not needed when Smile maintains departments and titles itself |
+| Resources                      | ✅⚠️       | Create/Update                              | Departments, Titles. Only created, not maintained, see [Remarks](#departments-and-titles-are-not-checked-or-maintained) |
 | Entitlement Import: Accounts   | ❌         | N/A                                        | Not available (no GET endpoint)            |
 | Entitlement Import: Permissions| ❌         | N/A                                        | Not available (no GET endpoint)            |
 
@@ -150,7 +166,7 @@ The correlation configuration should be left disabled.
 
 ### Field mapping
 
-The field mapping can be imported by using the `fieldMapping_standard.json` file.
+The field mapping can be imported by using the `fieldMapping.json` file.
 
 > [!NOTE]
 > The provided field mapping contains a **standard set of commonly used fields** (such as EmployeeNumber, FirstName, LastName, Email, Username, Department, Title, etc.). This mapping can be extended with additional fields as needed for your implementation. Any additional fields must be configured in the Smile import template before they can be processed.
@@ -159,7 +175,7 @@ The field mapping can be imported by using the `fieldMapping_standard.json` file
 > **EmployeeNumber is NOT mapped for Update actions.** The update script automatically adds the EmployeeNumber from the AccountReference to prevent duplicates when the source EmployeeNumber value changes. See [EmployeeNumber handling](#employeenumber-handling) for more details.
 
 > [!NOTE]
-> **Department and Title:** `Department` contains the department (project) code and `Title` the job title code as used in Smile (mapped from `Department.ExternalId` and `Title.ExternalId`). Smile no longer uses `PhoneNumber` and `Archived`; these fields are not part of the mapping.
+> **Department and Title:** `Department` and `Title` contain the department and title codes as used in Smile (mapped from `Department.ExternalId` and `Title.ExternalId`). Customer-specific changes to the mapping are made during the implementation, not in this connector.
 
 #### Fixed Value Fields
 
@@ -184,9 +200,21 @@ The webhook only accepts POST requests, so an account cannot be retrieved. The c
 
 If something fails, you only receive a generic HTTP error code. A success in HelloID only means Smile accepted the request, not that the data was processed as expected, so verify the result in Smile during testing.
 
+### Create behavior
+
+Create sends all fields mapped for Create. Smile creates the account, or updates it when the EmployeeNumber already exists. `Active` is sent as `false` for Create, so the account becomes active through the Enable action. The AccountReference is the EmployeeNumber, because Smile returns no identifier.
+
+### Update behavior
+
+Update sends the fields mapped for Update, plus the EmployeeNumber from the AccountReference. `Active` is not sent, so Update is not expected to change the active state; verify this during testing.
+
+### Enable and disable behavior
+
+Enable and disable only send `Active` (`true` or `false`) plus the EmployeeNumber from the AccountReference. Other fields are not sent, so Smile must accept a partial body for an existing account; verify this during testing. Disable leaves Email and Username filled until Delete.
+
 ### Departments and titles are not checked or maintained
 
-Departments (project code) and titles (job title code) are sent as plain values; the connector does not check if they exist or are active in Smile. Resource creation can create them, but does not update, deactivate or clean them up. Expired departments and titles must be maintained in Smile. When Smile maintains them itself, resource creation is not needed.
+Departments and titles are sent as plain codes; the connector does not check if they exist or are active in Smile. Resource creation can create them, but does not update, deactivate or clean them up. Expired departments and titles must be maintained in Smile. When Smile maintains them itself, resource creation is not needed.
 
 ### EmployeeNumber handling
 
@@ -201,7 +229,7 @@ As a result, the EmployeeNumber itself cannot be updated: a changed value would 
 > [!WARNING]
 > Map EmployeeNumber for **Create only**. If it is also mapped for Update, the script still sends the AccountReference value, which is then stored as account data. A changed source value then differs from the stored value on every run, causing endless updates.
 
-### No delete endpoint
+### Delete behavior
 
 Smile has no delete endpoint. The delete action is an update that sets the unique fields Email and Username to empty strings, so these values can be reused for other accounts. The account itself remains in Smile. If the account is granted again later, the create action fills Email and Username again.
 
@@ -242,6 +270,13 @@ Where:
 ### API documentation
 
 The Smile API documentation is not publicly available. Please contact Smile support for detailed API documentation.
+
+### Script conventions
+
+- Every action posts the mapped fields as JSON to the webhook with `Invoke-RestMethod`; the response is not used, as Smile returns no data
+- Errors are resolved by `Resolve-SmileError`, which returns the raw error because the webhook gives no error details
+- Enable, disable and delete add the EmployeeNumber from the AccountReference to the body, see [EmployeeNumber handling](#employeenumber-handling)
+- DryRun only logs what would be sent
 
 ## Getting help
 

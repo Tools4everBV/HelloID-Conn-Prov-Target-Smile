@@ -20,7 +20,7 @@
         },
         {
             "Name": "Department",
-            "Description": "Department or project code",
+            "Description": "Department code",
             "Type": "Text",
             "MappingActions": [
                 {
@@ -37,7 +37,7 @@
         },
         {
             "Name": "Title",
-            "Description": "Job title",
+            "Description": "Job title code",
             "Type": "Text",
             "MappingActions": [
                 {
