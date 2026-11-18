@@ -35,16 +35,8 @@ function Resolve-SmileError {
                 }
             }
         }
-        try {
-            $errorDetailsObject = ($httpErrorObj.ErrorDetails | ConvertFrom-Json)
-            # Make sure to inspect the error result object and add only the error message as a FriendlyMessage.
-            # $httpErrorObj.FriendlyMessage = $errorDetailsObject.message
-            $httpErrorObj.FriendlyMessage = $httpErrorObj.ErrorDetails # Temporarily assignment
-        }
-        catch {
-            $httpErrorObj.FriendlyMessage = $httpErrorObj.ErrorDetails
-            Write-Warning $_.Exception.Message
-        }
+        # The webhook returns no error details, so the friendly message is the raw error
+        $httpErrorObj.FriendlyMessage = $httpErrorObj.ErrorDetails
         Write-Output $httpErrorObj
     }
 }
@@ -73,7 +65,7 @@ try {
     }
 
     if (-Not($actionContext.DryRun -eq $true)) {
-        $deleteAccountResponse = Invoke-RestMethod @deleteAccountSplatParams
+        [void](Invoke-RestMethod @deleteAccountSplatParams)
 
         # Note: Smile webhook returns no data, so we return the mapped fields as output
         $outputContext.Data = $actionContext.Data
