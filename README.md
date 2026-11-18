@@ -13,7 +13,7 @@
 > - Nothing can be read back: no correlation and no import, see [No HTTP.GET available](#no-httpget-available)
 > - Errors are generic, so verify the result in Smile, see [The webhook returns no error details](#the-webhook-returns-no-error-details)
 > - EmployeeNumber is the identifier and is mapped for Create only, see [EmployeeNumber handling](#employeenumber-handling)
-> - Delete only empties Email and Username, see [Delete behavior](#delete-behavior)
+> - Delete only sets the account inactive and empties Email and Username, see [Delete behavior](#delete-behavior)
 >
 > Read the [Remarks](#remarks) carefully and test in the Smile acceptance environment first.
 
@@ -79,7 +79,7 @@ The following lifecycle actions are available:
 | update.ps1 | Updates an existing account                                           |
 | enable.ps1 | Enables an account (sets Active=true)                                |
 | disable.ps1| Disables an account (sets Active=false)                              |
-| delete.ps1 | Cleans up the unique fields (Email, Username) of an account          |
+| delete.ps1 | Sets Active=false and cleans up the unique fields (Email, Username) of an account |
 
 ## Getting started
 
@@ -237,7 +237,7 @@ As a result, the EmployeeNumber itself cannot be updated: a changed value would 
 
 ### Delete behavior
 
-Smile has no delete endpoint. The delete action is an update that sets the unique fields Email and Username to empty strings, so these values can be reused for other accounts. The account itself remains in Smile. If the account is granted again later, the create action fills Email and Username again.
+Smile has no delete endpoint. The delete action is an update that sets `Active` to `false` (in case the account was still active) and the unique fields Email and Username to empty strings, so these values can be reused for other accounts. The account itself remains in Smile. If the account is granted again later, the create action fills Email and Username again.
 
 ### Testing JSON before go-live
 

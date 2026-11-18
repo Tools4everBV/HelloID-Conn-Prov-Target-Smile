@@ -2,7 +2,7 @@
 # HelloID-Conn-Prov-Target-Smile-Delete
 # PowerShell V2
 # Note: See the README (Remarks) for how the Smile webhook works and its limitations.
-# - No actual delete endpoint: Delete is an update that empties the unique fields (Email, Username)
+# - No actual delete endpoint: Delete is an update that sets Active=false and empties the unique fields (Email, Username)
 # - EmployeeNumber is NOT mapped for Delete; the script adds it from the AccountReference
 ######################################################
 

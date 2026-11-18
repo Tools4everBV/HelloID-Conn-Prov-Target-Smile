@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file. The format 
 
 - **Breaking:** the field mapping changed, so re-import `fieldMapping.json` and review it per implementation: Archived and PhoneNumber removed, Title now uses Title.ExternalId (job title code), EmployeeNumber is mapped for Create only, and Email and Username use the placeholder Person.Accounts.MicrosoftActiveDirectory (adjust to the customer's Active Directory target system)
 - Changed disable and enable actions to only set Active (false/true), in line with the updated Smile webhook JSON
+- Changed delete to also set Active to false (in case the account was still active), in addition to emptying Email and Username
 - TenantGUID is now optional; the tenant part is left out of the webhook URL when it is empty
 - Simplified Resolve-SmileError, because the webhook returns no error details
 - Restructured the README to the current Tools4ever connector layout (warning block, feature legend, remarks per webhook limitation and action, script conventions) and clarified the connection settings in README.md and configuration.json

@@ -137,7 +137,8 @@
                 {
                     "MapForActions": [
                         "Disable",
-                        "Create"
+                        "Create",
+                        "Delete"
                     ],
                     "MappingMode": "Fixed",
                     "Value": "\"false\"",
