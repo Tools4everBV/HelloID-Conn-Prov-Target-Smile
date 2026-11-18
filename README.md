@@ -24,6 +24,7 @@
       - [Fixed Value Fields](#fixed-value-fields)
     - [Account Reference](#account-reference)
   - [Remarks](#remarks)
+    - [How the API works and what it means for this connector](#how-the-api-works-and-what-it-means-for-this-connector)
     - [No validation if the user account exists](#no-validation-if-the-user-account-exists)
     - [Minimal error handling within the webhook](#minimal-error-handling-within-the-webhook)
     - [EmployeeNumber handling](#employeenumber-handling)
@@ -174,6 +175,23 @@ Common examples:
 The account reference is populated with the `EmployeeNumber` field value, as Smile does not return account identifiers in the webhook response.
 
 ## Remarks
+
+### How the API works and what it means for this connector
+
+The Smile webhook is a **write-only, one-way** interface: every action is a POST of a JSON body, and Smile decides based on the content whether to create or update. The connector therefore works, but with these limitations:
+
+| Limitation of the webhook | Consequence for this connector |
+| ------------------------- | ------------------------------ |
+| No GET (nothing can be read back) | No correlation, no account/permission import, no check if an account exists, no reconciliation |
+| No error details, only a generic HTTP error | Troubleshooting is limited. Use the manual import in Smile to validate the JSON |
+| No delete endpoint | Delete only empties Email and Username; the account stays in Smile |
+| Not delivering an employee does not deactivate it | Deactivation only happens through the Disable action (`Active=false`). Configure when it runs in HelloID |
+| Disable only sets `Active=false` | Email and Username stay filled until Delete |
+| EmployeeNumber is the identifier | The EmployeeNumber (AccountReference) cannot be changed afterwards, see [EmployeeNumber handling](#employeenumber-handling) |
+| Departments and titles are free-text codes | HelloID does not check if they exist or are active in Smile. Resource creation only creates them; updating, deactivating and cleanup must be done in Smile |
+
+> [!NOTE]
+> Success in HelloID only means Smile accepted the request, not that the data was processed as expected. Verify the result in Smile during testing.
 
 ### No validation if the user account exists
 
