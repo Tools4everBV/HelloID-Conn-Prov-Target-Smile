@@ -63,8 +63,9 @@ try {
                 DepartmentName = $resource.DisplayName
             }
 
+            $tenantPath = if ([string]::IsNullOrEmpty($actionContext.Configuration.TenantGUID)) { '' } else { "/$($actionContext.Configuration.TenantGUID)" } # TenantGUID is optional
             $createDepartmentSplatParams = @{
-                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.DepartmentWebhookGUID)/$($actionContext.Configuration.TenantGUID)"
+                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.DepartmentWebhookGUID)$tenantPath"
                 Method      = 'POST'
                 Headers     = @{
                     'Content-Type' = 'application/json;charset=utf-8'

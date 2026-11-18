@@ -63,8 +63,9 @@ try {
                 TitleName = $resource.Name
             }
 
+            $tenantPath = if ([string]::IsNullOrEmpty($actionContext.Configuration.TenantGUID)) { '' } else { "/$($actionContext.Configuration.TenantGUID)" } # TenantGUID is optional
             $createTitleSplatParams = @{
-                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.TitleWebhookGUID)/$($actionContext.Configuration.TenantGUID)"
+                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.TitleWebhookGUID)$tenantPath"
                 Method      = 'POST'
                 Headers     = @{
                     'Content-Type' = 'application/json;charset=utf-8'
