@@ -43,14 +43,12 @@ function Resolve-SmileError {
 #endregion functions
 
 try {
-    # Add EmployeeNumber from AccountReference to body (needed for Smile to identify the account)
-    # EmployeeNumber should NOT be mapped in fieldMapping for Disable to prevent duplicates when source value changes
-    $actionContext.Data | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
-    
     # Process
     $actionMessage = "disabling account with AccountReference [$($actionContext.References.Account)]"
 
-    $disableAccountBody = $actionContext.Data
+    # EmployeeNumber is not mapped for Disable (prevents duplicates when the source value changes); add it from the AccountReference to the request body only, so Smile can identify the account
+    $disableAccountBody = $actionContext.Data.PSObject.Copy()
+    $disableAccountBody | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
 
     $tenantPath = if ([string]::IsNullOrEmpty($actionContext.configuration.TenantGUID)) { '' } else { "/$($actionContext.configuration.TenantGUID)" } # TenantGUID is optional
     $disableAccountSplatParams = @{

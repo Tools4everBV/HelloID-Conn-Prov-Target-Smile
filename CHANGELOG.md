@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file. The format 
 - Changed disable and enable actions to only set Active (false/true), in line with the updated Smile webhook JSON
 - Changed delete to also set Active to false (in case the account was still active), in addition to emptying Email and Username
 - TenantGUID is now optional; the tenant part is left out of the webhook URL when it is empty
+- Changed update, enable, disable and delete to add the EmployeeNumber to the request body only instead of to `Data`, so HelloID no longer filters values that are not in the field mapping
+- Changed update to leave `PreviousData` empty, so HelloID no longer reports "no changes" while the update was executed (the current data cannot be retrieved)
 - Simplified Resolve-SmileError, because the webhook returns no error details
 - Restructured the README to the current Tools4ever connector layout (warning block, feature legend, remarks per webhook limitation and action, script conventions) and clarified the connection settings in README.md and configuration.json
 - Shortened the script header notes and moved the Smile webhook explanation to the README

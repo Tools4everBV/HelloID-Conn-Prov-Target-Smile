@@ -213,7 +213,7 @@ Create sends all fields mapped for Create. Smile creates the account, or updates
 
 ### Update behavior
 
-Update sends the fields mapped for Update, plus the EmployeeNumber from the AccountReference. `Active` is not sent, so Update is not expected to change the active state; verify this during testing.
+Update sends the fields mapped for Update, plus the EmployeeNumber from the AccountReference. `Active` is not sent, so Update is not expected to change the active state; verify this during testing. Because the current data cannot be retrieved, it is unknown what changed: `PreviousData` is left empty, so HelloID shows that the update was executed instead of "no changes".
 
 ### Enable and disable behavior
 
@@ -228,13 +228,13 @@ Departments and titles are sent as plain codes; the connector does not check if 
 To prevent duplicate accounts when the EmployeeNumber changes in the source system:
 
 1. **EmployeeNumber is NOT mapped** in the field mapping for Update, Enable, Disable, and Delete actions
-2. The lifecycle scripts automatically add the EmployeeNumber from the HelloID AccountReference
+2. The lifecycle scripts add the EmployeeNumber from the HelloID AccountReference to the request body only (not to the account data), so no values outside the field mapping end up in the output
 3. This ensures the correct account is updated, even if the source EmployeeNumber has changed
 
 As a result, the EmployeeNumber itself cannot be updated: a changed value would create a new account in Smile.
 
 > [!WARNING]
-> Map EmployeeNumber for **Create only**. If it is also mapped for Update, the script still sends the AccountReference value, which is then stored as account data. A changed source value then differs from the stored value on every run, causing endless updates.
+> Map EmployeeNumber for **Create only**. If it is also mapped for Update, a changed source value triggers an update that still sends the AccountReference value, so nothing changes in Smile.
 
 ### Delete behavior
 
@@ -282,7 +282,7 @@ The Smile API documentation is not publicly available. Please contact Smile supp
 
 - Every action posts the mapped fields as JSON to the webhook with `Invoke-RestMethod`; the returned Smile database ID is only added to the audit log
 - Errors are resolved by `Resolve-SmileError`, which returns the raw error because the webhook gives no error details
-- Enable, disable and delete add the EmployeeNumber from the AccountReference to the body, see [EmployeeNumber handling](#employeenumber-handling)
+- Update, enable, disable and delete add the EmployeeNumber from the AccountReference to the request body only, not to `Data`, see [EmployeeNumber handling](#employeenumber-handling)
 - DryRun only logs what would be sent
 
 ## Getting help

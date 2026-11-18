@@ -42,14 +42,12 @@ function Resolve-SmileError {
 #endregion functions
 
 try {
-    # Add EmployeeNumber from AccountReference to body (needed for Smile to identify the account)
-    # EmployeeNumber should NOT be mapped in fieldMapping for Update to prevent duplicates when source value changes
-    $actionContext.Data | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
-    
     # Process
     $actionMessage = "updating account with AccountReference [$($actionContext.References.Account)] and Username [$($actionContext.Data.Username)]"
 
-    $updateAccountBody = $actionContext.Data
+    # EmployeeNumber is not mapped for Update (prevents duplicates when the source value changes); add it from the AccountReference to the request body only, so Smile can identify the account
+    $updateAccountBody = $actionContext.Data.PSObject.Copy()
+    $updateAccountBody | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
 
     $tenantPath = if ([string]::IsNullOrEmpty($actionContext.configuration.TenantGUID)) { '' } else { "/$($actionContext.configuration.TenantGUID)" } # TenantGUID is optional
     $updateAccountSplatParams = @{
@@ -70,6 +68,8 @@ try {
 
         # Note: Smile webhook returns no data, so we return the mapped fields as output
         $outputContext.Data = $actionContext.Data
+        # The current data cannot be retrieved (no GET), so PreviousData is empty: the update was executed, but what changed is unknown
+        $outputContext.PreviousData = $null
 
         $outputContext.AuditLogs.Add([PSCustomObject]@{
                 Action  = "UpdateAccount"
