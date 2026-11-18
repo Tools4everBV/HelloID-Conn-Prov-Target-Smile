@@ -46,14 +46,14 @@ function Resolve-SmileError {
 #endregion functions
 
 try {
-    $actionMessage = "creating [$(($resourceContext.SourceData | Measure-Object).Count)] title resources"
-    Write-Information "Creating [$($resourceContext.SourceData.Count)] title resources"
+    $actionMessage = "creating [$(($resourceData | Measure-Object).Count)] title resources"
+    Write-Information "Creating [$(($resourceData | Measure-Object).Count)] title resources"
 
     if ([string]::IsNullOrEmpty($actionContext.Configuration.TitleWebhookGUID)) {
         throw 'TitleWebhookGUID is not configured'
     }
 
-    foreach ($resource in $resourceContext.SourceData) {
+    foreach ($resource in $resourceData) {
         try {
             $actionMessage = "creating title resource with code [$($resource.ExternalId)] and name [$($resource.Name)]"
             
@@ -78,11 +78,13 @@ try {
 
             if (-not ($actionContext.DryRun -eq $true)) {
                 Write-Information "Creating title resource: $($titleBody | ConvertTo-Json)"
-                [void](Invoke-RestMethod @createTitleSplatParams)
-                
+                $createTitleResponse = Invoke-RestMethod @createTitleSplatParams
+                # The response is the Smile database ID; it is only logged, not stored or used
+                $smileIdMessage = if ([string]::IsNullOrEmpty("$createTitleResponse")) { '' } else { " Smile ID: [$createTitleResponse]" }
+           
                 $outputContext.AuditLogs.Add([PSCustomObject]@{
                         Action  = 'CreateResource'
-                        Message = "Created title resource with code [$($resource.ExternalId)] and name [$($resource.Name)]"
+                        Message = "Created title resource with code [$($resource.ExternalId)] and name [$($resource.Name)].$smileIdMessage"
                         IsError = $false
                     })
             }

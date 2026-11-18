@@ -46,14 +46,14 @@ function Resolve-SmileError {
 #endregion functions
 
 try {
-    $actionMessage = "creating [$(($resourceContext.SourceData | Measure-Object).Count)] department resources"
-    Write-Information "Creating [$($resourceContext.SourceData.Count)] department resources"
+    $actionMessage = "creating [$(($resourceData | Measure-Object).Count)] department resources"
+    Write-Information "Creating [$(($resourceData | Measure-Object).Count)] department resources"
 
     if ([string]::IsNullOrEmpty($actionContext.Configuration.DepartmentWebhookGUID)) {
         throw 'DepartmentWebhookGUID is not configured'
     }
 
-    foreach ($resource in $resourceContext.SourceData) {
+    foreach ($resource in $resourceData) {
         try {
             $actionMessage = "creating department resource with code [$($resource.ExternalId)] and name [$($resource.DisplayName)]"
             
@@ -78,11 +78,13 @@ try {
 
             if (-not ($actionContext.DryRun -eq $true)) {
                 Write-Information "Creating department resource: $($departmentBody | ConvertTo-Json)"
-                [void](Invoke-RestMethod @createDepartmentSplatParams)
-                
+                $createDepartmentResponse = Invoke-RestMethod @createDepartmentSplatParams
+                # The response is the Smile database ID; it is only logged, not stored or used
+                $smileIdMessage = if ([string]::IsNullOrEmpty("$createDepartmentResponse")) { '' } else { " Smile ID: [$createDepartmentResponse]" }
+
                 $outputContext.AuditLogs.Add([PSCustomObject]@{
                         Action  = 'CreateResource'
-                        Message = "Created department resource with code [$($resource.ExternalId)] and name [$($resource.DisplayName)]"
+                        Message = "Created department resource with code [$($resource.ExternalId)] and name [$($resource.DisplayName)].$smileIdMessage"
                         IsError = $false
                     })
             }
