@@ -61,7 +61,7 @@
       "type": "password",
       "label": "TenantGUID",
       "description": "The last part of the employee webhook URL, after the WebhookGUID",
-      "required": true
+      "required": false
     }
   }
 ]

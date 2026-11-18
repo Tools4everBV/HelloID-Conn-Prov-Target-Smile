@@ -144,7 +144,7 @@ The connector builds the webhook URL from the settings below:
 | BaseUrl      | The URL to the Smile environment | Yes       | Start of the webhook URL, without path (e.g. https://example.kader-platform.nl) |
 | EnvGUID      | The Environment GUID             | Yes       | Part of the URL between `/api/webhook/` and `/employee/`          |
 | WebhookGUID  | The Webhook GUID                 | Yes       | API key of the Employee (Medewerker) webhook in Smile            |
-| TenantGUID   | The Tenant GUID                  | Yes*      | Last part of the employee webhook URL, after the WebhookGUID      |
+| TenantGUID   | The Tenant GUID                  | No*      | Last part of the employee webhook URL, after the WebhookGUID      |
 | DepartmentWebhookGUID | The Department webhook GUID | No   | API key of the Department (Afdeling) webhook, only for resource creation |
 | TitleWebhookGUID | The Title webhook GUID       | No        | API key of the Title (Functie) webhook, only for resource creation |
 
