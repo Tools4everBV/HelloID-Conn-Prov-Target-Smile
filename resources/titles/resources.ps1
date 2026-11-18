@@ -80,11 +80,10 @@ try {
                 Write-Information "Creating title resource: $($titleBody | ConvertTo-Json)"
                 $createTitleResponse = Invoke-RestMethod @createTitleSplatParams
                 # The response is the Smile database ID; it is only logged, not stored or used
-                $smileIdMessage = if ([string]::IsNullOrEmpty("$createTitleResponse")) { '' } else { " Smile ID: [$createTitleResponse]" }
            
                 $outputContext.AuditLogs.Add([PSCustomObject]@{
                         Action  = 'CreateResource'
-                        Message = "Created title resource with code [$($resource.ExternalId)] and name [$($resource.Name)].$smileIdMessage"
+                        Message = "Created title resource with code [$($resource.ExternalId)] and name [$($resource.Name)]. Smile ID: [$createTitleResponse]"
                         IsError = $false
                     })
             }

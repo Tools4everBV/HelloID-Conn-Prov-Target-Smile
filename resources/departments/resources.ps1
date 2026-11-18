@@ -80,11 +80,10 @@ try {
                 Write-Information "Creating department resource: $($departmentBody | ConvertTo-Json)"
                 $createDepartmentResponse = Invoke-RestMethod @createDepartmentSplatParams
                 # The response is the Smile database ID; it is only logged, not stored or used
-                $smileIdMessage = if ([string]::IsNullOrEmpty("$createDepartmentResponse")) { '' } else { " Smile ID: [$createDepartmentResponse]" }
 
                 $outputContext.AuditLogs.Add([PSCustomObject]@{
                         Action  = 'CreateResource'
-                        Message = "Created department resource with code [$($resource.ExternalId)] and name [$($resource.DisplayName)].$smileIdMessage"
+                        Message = "Created department resource with code [$($resource.ExternalId)] and name [$($resource.DisplayName)]. Smile ID: [$createDepartmentResponse]"
                         IsError = $false
                     })
             }

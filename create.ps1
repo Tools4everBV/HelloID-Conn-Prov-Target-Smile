@@ -67,7 +67,6 @@ try {
     if (-Not($actionContext.DryRun -eq $true)) {
         $createAccountResponse = Invoke-RestMethod @createAccountSplatParams
         # The response is the Smile database ID; it is only logged, not stored or used
-        $smileIdMessage = if ([string]::IsNullOrEmpty("$createAccountResponse")) { '' } else { " Smile ID: [$createAccountResponse]" }
 
         # Note: Smile webhook returns no data, so we return the mapped fields as output and use the mapped field EmployeeNumber as AccountReference
         $outputContext.Data = $actionContext.Data
@@ -75,7 +74,7 @@ try {
 
         $outputContext.AuditLogs.Add([PSCustomObject]@{
                 Action  = "CreateAccount" # Optional
-                Message = "Created account with EmployeeNumber [$($actionContext.Data.EmployeeNumber)] and Username [$($actionContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)]$smileIdMessage"
+                Message = "Created account with EmployeeNumber [$($actionContext.Data.EmployeeNumber)] and Username [$($actionContext.Data.Username)]. AccountReference is: [$($outputContext.AccountReference)]. Smile ID: [$createAccountResponse]"
                 IsError = $false
             })
     }

@@ -68,14 +68,13 @@ try {
     if (-Not($actionContext.DryRun -eq $true)) {
         $enableAccountResponse = Invoke-RestMethod @enableAccountSplatParams
         # The response is the Smile database ID; it is only logged, not stored or used
-        $smileIdMessage = if ([string]::IsNullOrEmpty("$enableAccountResponse")) { '' } else { " Smile ID: [$enableAccountResponse]" }
 
         # Note: Smile webhook returns no data, so we return the mapped fields as output
         $outputContext.Data = $actionContext.Data
 
         $outputContext.AuditLogs.Add([PSCustomObject]@{
                 Action  = "EnableAccount"
-                Message = "Enabled account with AccountReference [$($actionContext.References.Account)].$smileIdMessage"
+                Message = "Enabled account with AccountReference [$($actionContext.References.Account)]. Smile ID: [$enableAccountResponse]"
                 IsError = $false
             })
     }

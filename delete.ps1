@@ -68,14 +68,13 @@ try {
     if (-Not($actionContext.DryRun -eq $true)) {
         $deleteAccountResponse = Invoke-RestMethod @deleteAccountSplatParams
         # The response is the Smile database ID; it is only logged, not stored or used
-        $smileIdMessage = if ([string]::IsNullOrEmpty("$deleteAccountResponse")) { '' } else { " Smile ID: [$deleteAccountResponse]" }
 
         # Note: Smile webhook returns no data, so we return the mapped fields as output
         $outputContext.Data = $actionContext.Data
 
         $outputContext.AuditLogs.Add([PSCustomObject]@{
                 Action  = "DeleteAccount"
-                Message = "Deleted account with AccountReference [$($actionContext.References.Account)] (cleaned up unique fields).$smileIdMessage"
+                Message = "Deleted account with AccountReference [$($actionContext.References.Account)] (cleaned up unique fields). Smile ID: [$deleteAccountResponse]"
                 IsError = $false
             })
     }
