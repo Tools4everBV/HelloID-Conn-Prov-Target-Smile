@@ -10,7 +10,7 @@
 > [!WARNING]
 > The Smile webhook only accepts POST requests and returns nothing but a database ID. Keep the following in mind:
 >
-> - Nothing can be read back: no correlation and no import, see [No HTTP.GET available](#no-httpget-available)
+> - Nothing can be read back: no correlation, no import, no reconciliation and no permissions, see [No HTTP.GET available](#no-httpget-available)
 > - Errors are generic, so verify the result in Smile, see [The webhook returns no error details](#the-webhook-returns-no-error-details)
 > - EmployeeNumber is the identifier and is mapped for Create only, see [EmployeeNumber handling](#employeenumber-handling)
 > - Delete only sets the account inactive and empties Email and Username, see [Delete behavior](#delete-behavior)
@@ -64,10 +64,11 @@ The following features are available:
 | ------------------------------ | --------- | ------------------------------------------ | ------------------------------------------ |
 | Account Lifecycle              | ✅⚠️       | Create, Update, Enable, Disable, Delete    | No delete endpoint, see [Account Lifecycle Actions](#account-lifecycle-actions) |
 | Correlation                    | ❌         | N/A                                        | Not possible (see [Remarks](#remarks))     |
-| Permissions                    | ❌         | N/A                                        | Not available                              |
+| Permissions                    | ❌         | N/A                                        | Not available: the webhook only processes employees, departments and titles |
 | Resources                      | ✅⚠️       | Create/Update                              | Departments, Titles. Only created, not maintained, see [Remarks](#departments-and-titles-are-not-checked-or-maintained) |
 | Entitlement Import: Accounts   | ❌         | N/A                                        | Not available (no GET endpoint)            |
 | Entitlement Import: Permissions| ❌         | N/A                                        | Not available (no GET endpoint)            |
+| Governance Reconciliation Resolutions | ❌  | N/A                                        | Not available (no GET endpoint, so no account import to reconcile) |
 
 ### Account Lifecycle Actions
 
@@ -200,7 +201,7 @@ The account reference is populated with the `EmployeeNumber` field value. The da
 
 ### No HTTP.GET available
 
-The webhook only accepts POST requests, so an account cannot be retrieved. The create action therefore always sends the account: if it already exists, Smile updates it instead. Smile returns the database ID of the processed object; the connector only adds it to the audit log (as information) and does not store or use it. The identification in Smile remains the EmployeeNumber (accounts) or code (departments and titles). As a result, correlation, account and permission import and reconciliation are not possible.
+The webhook only accepts POST requests, so an account cannot be retrieved. The create action therefore always sends the account: if it already exists, Smile updates it instead. Smile returns the database ID of the processed object; the connector only adds it to the audit log (as information) and does not store or use it. The identification in Smile remains the EmployeeNumber (accounts) or code (departments and titles). As a result, correlation, account and permission import, and governance reconciliation (including reconciliation resolutions) are not possible. Permissions are not available either, because the webhook only processes employees, departments and titles.
 
 ### The webhook returns no error details
 
