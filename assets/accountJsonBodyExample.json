@@ -1,0 +1,10 @@
+{
+    "FirstName": "John",
+    "LastName": "Doe",
+    "Department": "IT",
+    "Title": "ITADM",
+    "EmployeeNumber": "999999",
+    "Email": "john.doe@example.com",
+    "Username": "john.doe@example.com",
+    "Active": "true"
+}

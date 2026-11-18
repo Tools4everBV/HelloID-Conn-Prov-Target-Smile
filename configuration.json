@@ -5,7 +5,7 @@
     "defaultValue": "",
     "templateOptions": {
       "label": "BaseUrl",
-      "description": "The URL to the API.",
+      "description": "Smile URL without path, e.g. https://example.kader-platform.nl",
       "required": true
     }
   },
@@ -16,7 +16,7 @@
     "templateOptions": {
       "type": "password",
       "label": "EnvGUID",
-      "description": "The EnvGUID to connect to the API",
+      "description": "The part of the webhook URL between /api/webhook/ and /employee/",
       "required": true
     }
   },
@@ -27,8 +27,30 @@
     "templateOptions": {
       "type": "password",
       "label": "WebhookGUID",
-      "description": "The WebhookGUID to connect to the API",
+      "description": "The API key of the Employee (Medewerker) webhook in Smile",
       "required": true
+    }
+  },
+  {
+    "key": "DepartmentWebhookGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "DepartmentWebhookGUID",
+      "description": "Optional, only for resource creation. The API key of the Department (Afdeling) webhook. Enter the WebhookGUID value when one webhook is used",
+      "required": false
+    }
+  },
+  {
+    "key": "TitleWebhookGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "TitleWebhookGUID",
+      "description": "Optional, only for resource creation. The API key of the Title (Functie) webhook. Enter the WebhookGUID value when one webhook is used",
+      "required": false
     }
   },
   {
@@ -38,8 +60,8 @@
     "templateOptions": {
       "type": "password",
       "label": "TenantGUID",
-      "description": "The TenantGUID to connect to the API",
-      "required": true
+      "description": "Optional, the last part of the employee webhook URL, after the WebhookGUID",
+      "required": false
     }
   }
 ]
