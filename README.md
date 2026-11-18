@@ -48,7 +48,7 @@ The following features are available:
 | Account Lifecycle              | ✅         | Create, Update, Enable, Disable, Delete    | See [Account Lifecycle Actions](#account-lifecycle-actions) |
 | Correlation                    | ❌         | N/A                                        | Not possible (see [Remarks](#remarks))     |
 | Permissions                    | ❌         | N/A                                        | Not available                              |
-| Resources                      | ✅         | Create/Update                              | Departments, Titles                        |
+| Resources                      | ✅         | Create/Update                              | Departments, Titles. Optional: not needed when Smile maintains departments and titles itself |
 | Entitlement Import: Accounts   | ❌         | N/A                                        | Not available (no GET endpoint)            |
 | Entitlement Import: Permissions| ❌         | N/A                                        | Not available (no GET endpoint)            |
 
@@ -60,8 +60,8 @@ The following lifecycle actions are available:
 | ---------- | --------------------------------------------------------------------- |
 | create.ps1 | Creates or correlates an account (webhook determines action automatically) |
 | update.ps1 | Updates an existing account                                           |
-| enable.ps1 | Enables an account (sets Active=true, Archived=false)                |
-| disable.ps1| Disables an account (sets Active=false, Archived=true)               |
+| enable.ps1 | Enables an account (sets Active=true)                                |
+| disable.ps1| Disables an account (sets Active=false)                              |
 | delete.ps1 | Archives an account by cleaning up unique fields (Email, Username)   |
 
 ## Getting started
@@ -150,6 +150,9 @@ The field mapping can be imported by using the `fieldMapping_standard.json` file
 > [!NOTE]
 > **EmployeeNumber is NOT mapped for Update actions.** The update script automatically adds the EmployeeNumber from the AccountReference to prevent duplicates when the source EmployeeNumber value changes. See [EmployeeNumber handling](#employeenumber-handling) for more details.
 
+> [!NOTE]
+> **Department and Title:** `Department` contains the department (project) code and `Title` the job title code as used in Smile (mapped from `Department.ExternalId` and `Title.ExternalId`). Smile no longer uses `PhoneNumber` and `Archived`; these fields are not part of the mapping.
+
 #### Fixed Value Fields
 
 Some fields can be configured as fixed values directly in the Smile import template instead of mapping them in HelloID. This simplifies the field mapping and reduces maintenance.
@@ -186,9 +189,11 @@ To prevent duplicate accounts when the EmployeeNumber changes in the source syst
 ### Delete lifecycle action
 
 Smile does not provide an actual delete endpoint. The delete action performs an update that:
-- Cleans up unique fields (Email, Username, PhoneNumber) by setting them to empty strings
+- Cleans up unique fields (Email, Username) by setting them to empty strings
 - This allows these values to be reused for other accounts
-- The account remains in Smile but is marked as archived
+- The account remains in Smile, without a username it can no longer be used to sign in
+
+The disable action only sets `Active=false`. Email and Username stay filled until the delete action runs. If a person is granted the account again after a delete, the create action runs again and fills these fields.
 
 ### Testing JSON before go-live
 

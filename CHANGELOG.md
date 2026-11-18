@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Changed
 
+- Changed Title mapping to use Title.ExternalId (job title code) instead of Title.Name
+- Changed disable and enable actions to only set Active (false/true), in line with the updated Smile webhook JSON
 - Refactored all lifecycle scripts (create.ps1, update.ps1, enable.ps1, disable.ps1, delete.ps1) with improved error handling and logging
 - Enhanced update.ps1 to automatically add EmployeeNumber from AccountReference to prevent duplicates when source EmployeeNumber changes
 - Updated fieldMapping.json to include new fields and ensure proper mapping for account attributes
@@ -31,6 +33,10 @@ All notable changes to this project will be documented in this file. The format 
   - Enhanced remarks section with comprehensive explanations
 - Improved error handling across all scripts for better troubleshooting
 - Updated logo reference to use GitHub raw URL
+
+### Removed
+
+- Removed the Archived and PhoneNumber fields from the field mapping and the account JSON example, as Smile no longer uses them
 
 ### Fixed
 
