@@ -24,12 +24,11 @@
       - [Fixed Value Fields](#fixed-value-fields)
     - [Account Reference](#account-reference)
   - [Remarks](#remarks)
-    - [No validation if the user account exists](#no-validation-if-the-user-account-exists)
-    - [Minimal error handling within the webhook](#minimal-error-handling-within-the-webhook)
-    - [Deactivating accounts](#deactivating-accounts)
-    - [Departments and titles](#departments-and-titles)
+    - [No HTTP.GET available](#no-httpget-available)
+    - [The webhook returns no error details](#the-webhook-returns-no-error-details)
+    - [Departments and titles are not checked or maintained](#departments-and-titles-are-not-checked-or-maintained)
     - [EmployeeNumber handling](#employeenumber-handling)
-    - [Delete lifecycle action](#delete-lifecycle-action)
+    - [No delete endpoint](#no-delete-endpoint)
     - [Testing JSON before go-live](#testing-json-before-go-live)
   - [Development resources](#development-resources)
     - [Webhook endpoints](#webhook-endpoints)
@@ -64,7 +63,7 @@ The following lifecycle actions are available:
 | update.ps1 | Updates an existing account                                           |
 | enable.ps1 | Enables an account (sets Active=true)                                |
 | disable.ps1| Disables an account (sets Active=false)                              |
-| delete.ps1 | Archives an account by cleaning up unique fields (Email, Username)   |
+| delete.ps1 | Cleans up the unique fields (Email, Username) of an account          |
 
 ## Getting started
 
@@ -177,29 +176,17 @@ The account reference is populated with the `EmployeeNumber` field value, as Smi
 
 ## Remarks
 
-### No validation if the user account exists
+### No HTTP.GET available
 
-Because there's no HTTP.GET available to retrieve an account, the create lifecycle action will **always** create the account. If the account already exists, it will be updated instead. If the user is successfully created or updated, you will get back a random number. The connector doesn't actually handle this number since it has no meaning.
+The webhook only accepts POST requests, so an account cannot be retrieved. The create action therefore always sends the account: if it already exists, Smile updates it instead. Smile returns a random number that has no meaning and is not used by the connector. As a result, correlation, account and permission import and reconciliation are not possible.
 
-**Impact:** correlation, account/permission import and reconciliation are not possible.
+### The webhook returns no error details
 
-### Minimal error handling within the webhook
+If something fails, you only receive a generic HTTP error code. A success in HelloID only means Smile accepted the request, not that the data was processed as expected, so verify the result in Smile during testing.
 
-The webhook does not return any error information. If something fails, you will only receive a generic HTTP error code.
+### Departments and titles are not checked or maintained
 
-**Impact:** a success in HelloID only means Smile accepted the request, not that the data was processed as expected. Troubleshooting is limited, so verify the result in Smile during testing.
-
-### Deactivating accounts
-
-Smile does not deactivate an employee when HelloID stops delivering it. An account is only deactivated by the disable action, which sets `Active=false`.
-
-**Impact:** configure in HelloID when the disable action runs. Email and Username stay filled after a disable until the delete action runs.
-
-### Departments and titles
-
-Departments (project code) and titles (job title code) are sent as plain values. The connector does not check if they exist or are active in Smile. Resource creation can create them, but does not update, deactivate or clean them up.
-
-**Impact:** maintenance of departments and titles, such as expired ones, must be done in Smile. Resource creation is optional and not needed when Smile maintains them itself.
+Departments (project code) and titles (job title code) are sent as plain values; the connector does not check if they exist or are active in Smile. Resource creation can create them, but does not update, deactivate or clean them up. Expired departments and titles must be maintained in Smile. When Smile maintains them itself, resource creation is not needed.
 
 ### EmployeeNumber handling
 
@@ -209,19 +196,14 @@ To prevent duplicate accounts when the EmployeeNumber changes in the source syst
 2. The lifecycle scripts automatically add the EmployeeNumber from the HelloID AccountReference
 3. This ensures the correct account is updated, even if the source EmployeeNumber has changed
 
-**Consequence:** Updating the EmployeeNumber itself is not possible, as this would create a new account in Smile by design.
+As a result, the EmployeeNumber itself cannot be updated: a changed value would create a new account in Smile.
 
 > [!WARNING]
 > Map EmployeeNumber for **Create only**. If it is also mapped for Update, the script still sends the AccountReference value, which is then stored as account data. A changed source value then differs from the stored value on every run, causing endless updates.
 
-### Delete lifecycle action
+### No delete endpoint
 
-Smile does not provide an actual delete endpoint. The delete action performs an update that:
-- Cleans up unique fields (Email, Username) by setting them to empty strings
-- This allows these values to be reused for other accounts
-- The account remains in Smile, without a username it can no longer be used to sign in
-
-**Impact:** the account is never removed from Smile. If a person is granted the account again after a delete, the create action runs again and fills Email and Username.
+Smile has no delete endpoint. The delete action is an update that sets the unique fields Email and Username to empty strings, so these values can be reused for other accounts. The account itself remains in Smile. If the account is granted again later, the create action fills Email and Username again.
 
 ### Testing JSON before go-live
 

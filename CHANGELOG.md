@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file. The format 
 - Changed Title mapping to use Title.ExternalId (job title code) instead of Title.Name
 - Changed EmployeeNumber mapping to Create only (was Create and Update), with a caution in the field description and README
 - Shortened the script header notes and moved the Smile webhook explanation to the README
-- Added the impact of the webhook limitations per topic to the README remarks (deactivating accounts, departments and titles)
+- Reworked the README remarks: one explanation per webhook limitation (no GET, no error details, departments and titles, no delete endpoint)
 - Clarified the connection settings (webhook URL construction) in README.md and configuration.json
 - Changed disable and enable actions to only set Active (false/true), in line with the updated Smile webhook JSON
 - Refactored all lifecycle scripts (create.ps1, update.ps1, enable.ps1, disable.ps1, delete.ps1) with improved error handling and logging
