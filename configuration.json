@@ -60,7 +60,7 @@
     "templateOptions": {
       "type": "password",
       "label": "TenantGUID",
-      "description": "The last part of the employee webhook URL, after the WebhookGUID",
+      "description": "Optional, the last part of the employee webhook URL, after the WebhookGUID",
       "required": false
     }
   }

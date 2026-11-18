@@ -199,7 +199,7 @@ The account reference is populated with the `EmployeeNumber` field value, as Smi
 
 ### No HTTP.GET available
 
-The webhook only accepts POST requests, so an account cannot be retrieved. The create action therefore always sends the account: if it already exists, Smile updates it instead. Smile returns a random number that has no meaning and is not used by the connector. As a result, correlation, account and permission import and reconciliation are not possible.
+The webhook only accepts POST requests, so an account cannot be retrieved. The create action therefore always sends the account: if it already exists, Smile updates it instead. Smile returns the database ID of the processed object; the connector only adds it to the audit log (as information) and does not store or use it. The identification in Smile remains the EmployeeNumber (accounts) or code (departments and titles). As a result, correlation, account and permission import and reconciliation are not possible.
 
 ### The webhook returns no error details
 

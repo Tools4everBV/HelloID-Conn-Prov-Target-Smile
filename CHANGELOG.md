@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file. The format 
 - Changed Title mapping to use Title.ExternalId (job title code) instead of Title.Name
 - Changed EmployeeNumber mapping to Create only (was Create and Update), with a caution in the field description and README
 - Resource creation for departments and titles now uses its own webhook key (new optional settings DepartmentWebhookGUID and TitleWebhookGUID) instead of the employee WebhookGUID; enter the same value when one webhook is used
+- Added the database ID that Smile returns to the audit logs of all actions (information only, not stored and not used as AccountReference)
+- Fixed resource creation to process the deduplicated resource data instead of the raw source data
 - TenantGUID is now optional; the tenant part is left out of the webhook URL when it is empty
 - Replaced the hardcoded Active Directory target system GUID in the Email and Username mapping with the placeholder Person.Accounts.MicrosoftActiveDirectory, to be adjusted per customer
 - Simplified Resolve-SmileError (the webhook returns no error details) and removed unused response variables in all scripts
