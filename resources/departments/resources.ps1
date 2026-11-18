@@ -1,11 +1,8 @@
 ########################################################################
 # HelloID-Conn-Prov-Target-Smile-Resources-Departments
 # PowerShell V2
-# Note: Smile webhook for resource creation:
-# - No OAuth token authentication needed (only webhook URL with GUIDs)
-# - No HTTP.GET available: cannot check if resource exists
-# - Resource creation is a POST that creates OR updates automatically
-# - Minimal error handling: webhook only returns generic HTTP errors
+# Note: See the README (Remarks) for how the Smile webhook works and its limitations.
+# - Resource creation is a POST that creates OR updates automatically (no existence check)
 ######################################################
 
 # Make sure the resourceContext data is unique. Fill in the required fields after -unique

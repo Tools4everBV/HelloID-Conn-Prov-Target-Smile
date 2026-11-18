@@ -38,7 +38,7 @@
 
 ## Introduction
 
-HelloID-Conn-Prov-Target-Smile is a _target_ connector. Smile provides a webhook API that exclusively supports HTTP POST requests. Unlike conventional REST APIs with full CRUD operations, the Smile webhook automatically determines whether to create or update resources based on unique identifiers in the request body.
+HelloID-Conn-Prov-Target-Smile is a _target_ connector. Smile provides a webhook API that exclusively supports HTTP POST requests. Unlike conventional REST APIs with full CRUD operations, the Smile webhook automatically determines whether to create or update resources based on unique identifiers in the request body. There is no OAuth or token authentication: the GUIDs in the webhook URL act as the key, so treat them as secrets.
 
 ## Supported features
 

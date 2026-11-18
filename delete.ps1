@@ -1,14 +1,9 @@
 ########################################################################
 # HelloID-Conn-Prov-Target-Smile-Delete
 # PowerShell V2
-# Note: Smile webhook differences compared to other APIs:
-# - No OAuth token authentication needed (only webhook URL with GUIDs)
-# - No HTTP.GET available: cannot check if account exists
-# - No actual delete endpoint: delete action performs update to cleanup unique fields
-# - Minimal error handling: webhook only returns generic HTTP errors
-# - EmployeeNumber NOT mapped for Delete: prevents duplicates when source value changes
-#   Script adds EmployeeNumber from AccountReference to ensure correct account is updated
-#   Consequence: updating EmployeeNumber is not possible (would create new account in Smile)
+# Note: See the README (Remarks) for how the Smile webhook works and its limitations.
+# - No actual delete endpoint: Delete is an update that empties the unique fields (Email, Username)
+# - EmployeeNumber is NOT mapped for Delete; the script adds it from the AccountReference
 ######################################################
 
 # Enable TLS1.2

@@ -1,14 +1,9 @@
 ########################################################################
 # HelloID-Conn-Prov-Target-Smile-Enable
 # PowerShell V2
-# Note: Smile webhook differences compared to other APIs:
-# - No OAuth token authentication needed (only webhook URL with GUIDs)
-# - No HTTP.GET available: cannot check if account exists
-# - Enable action is an update (sets Active=true)
-# - Minimal error handling: webhook only returns generic HTTP errors
-# - EmployeeNumber NOT mapped for Enable: prevents duplicates when source value changes
-#   Script adds EmployeeNumber from AccountReference to ensure correct account is updated
-#   Consequence: updating EmployeeNumber is not possible (would create new account in Smile)
+# Note: See the README (Remarks) for how the Smile webhook works and its limitations.
+# - Enable is an update (sets Active=true)
+# - EmployeeNumber is NOT mapped for Enable; the script adds it from the AccountReference
 ######################################################
 
 # Enable TLS1.2

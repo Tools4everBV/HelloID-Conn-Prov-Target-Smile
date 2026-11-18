@@ -1,12 +1,8 @@
 ########################################################################
 # HelloID-Conn-Prov-Target-Smile-Create
 # PowerShell V2
-# Note: Smile webhook differences compared to other APIs:
-# - No OAuth token authentication needed (only webhook URL with GUIDs)
-# - No HTTP.GET available: No correlation possible
-# - Create action always creates account OR updates existing (automatically)
-# - Correlation configuration is NOT needed (not used)
-# - Minimal error handling: webhook only returns generic HTTP errors
+# Note: See the README (Remarks) for how the Smile webhook works and its limitations.
+# - Create always creates the account OR updates the existing one (no correlation)
 # - AccountReference comes from $actionContext.Data.EmployeeNumber
 ######################################################
 
