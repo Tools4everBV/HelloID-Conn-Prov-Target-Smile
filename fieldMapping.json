@@ -54,13 +54,12 @@
         },
         {
             "Name": "EmployeeNumber",
-            "Description": "Unique employee identifier",
+            "Description": "Unique employee identifier. CAUTION: map for Create only. Other actions use the AccountReference; mapping Update would trigger endless updates and a changed value would create a duplicate account in Smile.",
             "Type": "Text",
             "MappingActions": [
                 {
                     "MapForActions": [
-                        "Create",
-                        "Update"
+                        "Create"
                     ],
                     "MappingMode": "Field",
                     "Value": "\"Person.ExternalId\"",

@@ -193,6 +193,9 @@ To prevent duplicate accounts when the EmployeeNumber changes in the source syst
 
 **Consequence:** Updating the EmployeeNumber itself is not possible, as this would create a new account in Smile by design.
 
+> [!WARNING]
+> Map EmployeeNumber for **Create only**. If it is also mapped for Update, the script still sends the AccountReference value, which is then stored as account data. A changed source value then differs from the stored value on every run, causing endless updates.
+
 ### Delete lifecycle action
 
 Smile does not provide an actual delete endpoint. The delete action performs an update that:
