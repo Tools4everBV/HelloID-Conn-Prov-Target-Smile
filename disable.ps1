@@ -46,8 +46,8 @@ try {
     # Process
     $actionMessage = "disabling account with AccountReference [$($actionContext.References.Account)]"
 
-    # EmployeeNumber is not mapped for Disable (prevents duplicates when the source value changes); add it from the AccountReference to the request body only, so Smile can identify the account
-    $disableAccountBody = $actionContext.Data.PSObject.Copy()
+    # EmployeeNumber is not mapped for Disable (prevents duplicates when the source value changes); add it from the AccountReference to a copy of Data (the request body only), so Smile can identify the account
+    $disableAccountBody = $actionContext.Data | ConvertTo-Json -Depth 10 | ConvertFrom-Json
     $disableAccountBody | Add-Member -MemberType NoteProperty -Name 'EmployeeNumber' -Value $actionContext.References.Account -Force
 
     $tenantPath = if ([string]::IsNullOrEmpty($actionContext.configuration.TenantGUID)) { '' } else { "/$($actionContext.configuration.TenantGUID)" } # TenantGUID is optional
