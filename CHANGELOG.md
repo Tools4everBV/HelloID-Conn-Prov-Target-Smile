@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file. The format 
 
 - Changed Title mapping to use Title.ExternalId (job title code) instead of Title.Name
 - Changed EmployeeNumber mapping to Create only (was Create and Update), with a caution in the field description and README
+- Resource creation for departments and titles now uses its own webhook key (new optional settings DepartmentWebhookGUID and TitleWebhookGUID) instead of the employee WebhookGUID; enter the same value when one webhook is used
 - Simplified Resolve-SmileError (the webhook returns no error details) and removed unused response variables in all scripts
 - Restructured the README to the current Tools4ever connector layout (warning block, feature legend, behavior per action, script conventions)
 - Shortened the script header notes and moved the Smile webhook explanation to the README

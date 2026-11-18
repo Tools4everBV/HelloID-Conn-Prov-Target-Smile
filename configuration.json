@@ -32,6 +32,28 @@
     }
   },
   {
+    "key": "DepartmentWebhookGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "DepartmentWebhookGUID",
+      "description": "Optional, only for resource creation. The API key of the Department (Afdeling) webhook. Enter the WebhookGUID value when one webhook is used",
+      "required": false
+    }
+  },
+  {
+    "key": "TitleWebhookGUID",
+    "type": "input",
+    "defaultValue": "",
+    "templateOptions": {
+      "type": "password",
+      "label": "TitleWebhookGUID",
+      "description": "Optional, only for resource creation. The API key of the Title (Functie) webhook. Enter the WebhookGUID value when one webhook is used",
+      "required": false
+    }
+  },
+  {
     "key": "TenantGUID",
     "type": "input",
     "defaultValue": "",

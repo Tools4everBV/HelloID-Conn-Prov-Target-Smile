@@ -145,9 +145,11 @@ The connector builds the webhook URL from the settings below:
 | EnvGUID      | The Environment GUID             | Yes       | Part of the URL between `/api/webhook/` and `/employee/`          |
 | WebhookGUID  | The Webhook GUID                 | Yes       | API key of the Employee (Medewerker) webhook in Smile            |
 | TenantGUID   | The Tenant GUID                  | Yes*      | Last part of the employee webhook URL, after the WebhookGUID      |
+| DepartmentWebhookGUID | The Department webhook GUID | No   | API key of the Department (Afdeling) webhook, only for resource creation |
+| TitleWebhookGUID | The Title webhook GUID       | No        | API key of the Title (Functie) webhook, only for resource creation |
 
 > [!NOTE]
-> Only the Employee webhook is used by the account lifecycle. The API keys of the Department and Title webhooks are only needed when resource creation is used.
+> The account lifecycle only uses the Employee webhook. Department and title resource creation each use their own webhook key; leave them empty when resource creation is not used. When one webhook is used for everything, enter the WebhookGUID value in both.
 
 > [!NOTE]
 > *TenantGUID is only relevant for multi-tenant Smile environments. For single-tenant implementations, this GUID is included in the URL pattern but may not be actively used for authentication.
@@ -248,7 +250,7 @@ This helps ensure the import template is correctly configured before the webhook
 
 ### Webhook endpoints
 
-The connector uses a single webhook endpoint for all operations (employee accounts, departments, and titles):
+All webhooks use the same URL pattern; only the webhook key differs per webhook (employee, department, title):
 
 ```
 {BaseUrl}/api/webhook/{EnvGUID}/employee/{WebhookGUID}/{TenantGUID}
@@ -257,15 +259,15 @@ The connector uses a single webhook endpoint for all operations (employee accoun
 Where:
 - **BaseUrl**: Your Smile environment URL
 - **EnvGUID**: Environment GUID (identifies your Smile environment)
-- **WebhookGUID**: Webhook GUID (unique identifier for the webhook)
+- **WebhookGUID**: Webhook key (`WebhookGUID` for employees, `DepartmentWebhookGUID` for departments, `TitleWebhookGUID` for titles)
 - **TenantGUID**: Tenant GUID (only relevant for multi-tenant environments)
 
 | Endpoint                                                               | Method | Description                    |
 | ---------------------------------------------------------------------- | ------ | ------------------------------ |
-| /api/webhook/{EnvGUID}/employee/{WebhookGUID}/{TenantGUID}            | POST   | Used for all operations: employee lifecycle (create, update, enable, disable, delete), department creation, and title creation. The Smile import template determines how to process the data based on the fields present in the JSON payload. |
+| /api/webhook/{EnvGUID}/employee/{WebhookGUID}/{TenantGUID}            | POST   | Employee lifecycle (create, update, enable, disable, delete) with `WebhookGUID`; department creation with `DepartmentWebhookGUID`; title creation with `TitleWebhookGUID`. The Smile import template determines how to process the data based on the fields present in the JSON payload. |
 
 > [!NOTE]
-> All three resource types (employee, department, title) use the **same webhook endpoint**. They are stored as employee objects in Smile's organizational table (MVI) and differentiated by their **Type** field and the fields sent in the request body.
+> Departments and titles are stored as employee objects in Smile's organizational table (MVI) and differentiated by their **Type** field and the fields sent in the request body. Confirm with Smile that the URL of the department and title webhook also uses the `employee` path.
 
 ### API documentation
 

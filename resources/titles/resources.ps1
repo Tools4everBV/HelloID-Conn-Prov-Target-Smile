@@ -3,6 +3,7 @@
 # PowerShell V2
 # Note: See the README (Remarks) for how the Smile webhook works and its limitations.
 # - Resource creation is a POST that creates OR updates automatically (no existence check)
+# - Uses its own webhook key (TitleWebhookGUID); enter the same value as WebhookGUID when one webhook is used
 ######################################################
 
 # Make sure the resourceContext data is unique. Fill in the required fields after -unique
@@ -47,7 +48,11 @@ function Resolve-SmileError {
 try {
     $actionMessage = "creating [$(($resourceContext.SourceData | Measure-Object).Count)] title resources"
     Write-Information "Creating [$($resourceContext.SourceData.Count)] title resources"
-    
+
+    if ([string]::IsNullOrEmpty($actionContext.Configuration.TitleWebhookGUID)) {
+        throw 'TitleWebhookGUID is not configured'
+    }
+
     foreach ($resource in $resourceContext.SourceData) {
         try {
             $actionMessage = "creating title resource with code [$($resource.ExternalId)] and name [$($resource.Name)]"
@@ -59,7 +64,7 @@ try {
             }
 
             $createTitleSplatParams = @{
-                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.WebhookGUID)/$($actionContext.Configuration.TenantGUID)"
+                Uri         = "$($actionContext.Configuration.BaseUrl)/api/webhook/$($actionContext.Configuration.EnvGUID)/employee/$($actionContext.Configuration.TitleWebhookGUID)/$($actionContext.Configuration.TenantGUID)"
                 Method      = 'POST'
                 Headers     = @{
                     'Content-Type' = 'application/json;charset=utf-8'
