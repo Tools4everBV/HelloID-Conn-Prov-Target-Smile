@@ -24,9 +24,10 @@
       - [Fixed Value Fields](#fixed-value-fields)
     - [Account Reference](#account-reference)
   - [Remarks](#remarks)
-    - [How the API works and what it means for this connector](#how-the-api-works-and-what-it-means-for-this-connector)
     - [No validation if the user account exists](#no-validation-if-the-user-account-exists)
     - [Minimal error handling within the webhook](#minimal-error-handling-within-the-webhook)
+    - [Deactivating accounts](#deactivating-accounts)
+    - [Departments and titles](#departments-and-titles)
     - [EmployeeNumber handling](#employeenumber-handling)
     - [Delete lifecycle action](#delete-lifecycle-action)
     - [Testing JSON before go-live](#testing-json-before-go-live)
@@ -176,30 +177,29 @@ The account reference is populated with the `EmployeeNumber` field value, as Smi
 
 ## Remarks
 
-### How the API works and what it means for this connector
-
-The Smile webhook is a **write-only, one-way** interface: every action is a POST of a JSON body, and Smile decides based on the content whether to create or update. The connector therefore works, but with these limitations:
-
-| Limitation of the webhook | Consequence for this connector |
-| ------------------------- | ------------------------------ |
-| No GET (nothing can be read back) | No correlation, no account/permission import, no check if an account exists, no reconciliation |
-| No error details, only a generic HTTP error | Troubleshooting is limited. Use the manual import in Smile to validate the JSON |
-| No delete endpoint | Delete only empties Email and Username; the account stays in Smile |
-| Not delivering an employee does not deactivate it | Deactivation only happens through the Disable action (`Active=false`). Configure when it runs in HelloID |
-| Disable only sets `Active=false` | Email and Username stay filled until Delete |
-| EmployeeNumber is the identifier | The EmployeeNumber (AccountReference) cannot be changed afterwards, see [EmployeeNumber handling](#employeenumber-handling) |
-| Departments and titles are free-text codes | HelloID does not check if they exist or are active in Smile. Resource creation only creates them; updating, deactivating and cleanup must be done in Smile |
-
-> [!NOTE]
-> Success in HelloID only means Smile accepted the request, not that the data was processed as expected. Verify the result in Smile during testing.
-
 ### No validation if the user account exists
 
 Because there's no HTTP.GET available to retrieve an account, the create lifecycle action will **always** create the account. If the account already exists, it will be updated instead. If the user is successfully created or updated, you will get back a random number. The connector doesn't actually handle this number since it has no meaning.
 
+**Impact:** correlation, account/permission import and reconciliation are not possible.
+
 ### Minimal error handling within the webhook
 
 The webhook does not return any error information. If something fails, you will only receive a generic HTTP error code.
+
+**Impact:** a success in HelloID only means Smile accepted the request, not that the data was processed as expected. Troubleshooting is limited, so verify the result in Smile during testing.
+
+### Deactivating accounts
+
+Smile does not deactivate an employee when HelloID stops delivering it. An account is only deactivated by the disable action, which sets `Active=false`.
+
+**Impact:** configure in HelloID when the disable action runs. Email and Username stay filled after a disable until the delete action runs.
+
+### Departments and titles
+
+Departments (project code) and titles (job title code) are sent as plain values. The connector does not check if they exist or are active in Smile. Resource creation can create them, but does not update, deactivate or clean them up.
+
+**Impact:** maintenance of departments and titles, such as expired ones, must be done in Smile. Resource creation is optional and not needed when Smile maintains them itself.
 
 ### EmployeeNumber handling
 
@@ -221,7 +221,7 @@ Smile does not provide an actual delete endpoint. The delete action performs an 
 - This allows these values to be reused for other accounts
 - The account remains in Smile, without a username it can no longer be used to sign in
 
-The disable action only sets `Active=false`. Email and Username stay filled until the delete action runs. If a person is granted the account again after a delete, the create action runs again and fills these fields.
+**Impact:** the account is never removed from Smile. If a person is granted the account again after a delete, the create action runs again and fills Email and Username.
 
 ### Testing JSON before go-live
 
