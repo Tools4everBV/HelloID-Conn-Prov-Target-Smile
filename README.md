@@ -8,7 +8,7 @@
 </p>
 
 > [!WARNING]
-> The Smile webhook only accepts POST requests and returns no data. Keep the following in mind:
+> The Smile webhook only accepts POST requests and returns nothing but a database ID. Keep the following in mind:
 >
 > - Nothing can be read back: no correlation and no import, see [No HTTP.GET available](#no-httpget-available)
 > - Errors are generic, so verify the result in Smile, see [The webhook returns no error details](#the-webhook-returns-no-error-details)
@@ -97,7 +97,8 @@ https://raw.githubusercontent.com/Tools4everBV/HelloID-Conn-Prov-Target-Smile/re
 - The following GUIDs provided by Smile:
   - Environment GUID (EnvGUID)
   - Webhook GUID (WebhookGUID)
-  - Tenant GUID (TenantGUID)
+  - Tenant GUID (TenantGUID), optional
+  - Department and title webhook GUIDs (DepartmentWebhookGUID, TitleWebhookGUID), only for resource creation
 - Configured import templates in Smile (see [Setup in Smile](#setup-in-smile))
 
 > [!IMPORTANT]
@@ -193,7 +194,7 @@ Common examples:
 
 ### Account Reference
 
-The account reference is populated with the `EmployeeNumber` field value, as Smile does not return account identifiers in the webhook response.
+The account reference is populated with the `EmployeeNumber` field value. The database ID that Smile returns is only logged and is not used as account reference.
 
 ## Remarks
 
@@ -207,7 +208,7 @@ If something fails, you only receive a generic HTTP error code. A success in Hel
 
 ### Create behavior
 
-Create sends all fields mapped for Create. Smile creates the account, or updates it when the EmployeeNumber already exists. `Active` is sent as `false` for Create, so the account becomes active through the Enable action. The AccountReference is the EmployeeNumber, because Smile returns no identifier.
+Create sends all fields mapped for Create. Smile creates the account, or updates it when the EmployeeNumber already exists. `Active` is sent as `false` for Create, so the account becomes active through the Enable action. The AccountReference is the EmployeeNumber, see [Account Reference](#account-reference).
 
 ### Update behavior
 
@@ -263,7 +264,7 @@ Where:
 - **BaseUrl**: Your Smile environment URL
 - **EnvGUID**: Environment GUID (identifies your Smile environment)
 - **WebhookGUID**: Webhook key (`WebhookGUID` for employees, `DepartmentWebhookGUID` for departments, `TitleWebhookGUID` for titles)
-- **TenantGUID**: Tenant GUID (only relevant for multi-tenant environments)
+- **TenantGUID**: Tenant GUID (optional, left out of the URL when empty)
 
 | Endpoint                                                               | Method | Description                    |
 | ---------------------------------------------------------------------- | ------ | ------------------------------ |
@@ -278,7 +279,7 @@ The Smile API documentation is not publicly available. Please contact Smile supp
 
 ### Script conventions
 
-- Every action posts the mapped fields as JSON to the webhook with `Invoke-RestMethod`; the response is not used, as Smile returns no data
+- Every action posts the mapped fields as JSON to the webhook with `Invoke-RestMethod`; the returned Smile database ID is only added to the audit log
 - Errors are resolved by `Resolve-SmileError`, which returns the raw error because the webhook gives no error details
 - Enable, disable and delete add the EmployeeNumber from the AccountReference to the body, see [EmployeeNumber handling](#employeenumber-handling)
 - DryRun only logs what would be sent
