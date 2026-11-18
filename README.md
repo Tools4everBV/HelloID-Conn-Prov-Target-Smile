@@ -152,7 +152,7 @@ The connector builds the webhook URL from the settings below:
 > The account lifecycle only uses the Employee webhook. Department and title resource creation each use their own webhook key; leave them empty when resource creation is not used. When one webhook is used for everything, enter the WebhookGUID value in both.
 
 > [!NOTE]
-> *TenantGUID is only relevant for multi-tenant Smile environments. For single-tenant implementations, this GUID is included in the URL pattern but may not be actively used for authentication.
+> *TenantGUID is optional. When it is empty, the `/{TenantGUID}` part is left out of the webhook URL.
 
 ### Correlation configuration
 
@@ -175,6 +175,9 @@ The field mapping can be imported by using the `fieldMapping.json` file.
 
 > [!NOTE]
 > **EmployeeNumber is NOT mapped for Update actions.** The update script automatically adds the EmployeeNumber from the AccountReference to prevent duplicates when the source EmployeeNumber value changes. See [EmployeeNumber handling](#employeenumber-handling) for more details.
+
+> [!NOTE]
+> **Email and Username:** these are mapped from the customer's Active Directory account (`Person.Accounts.MicrosoftActiveDirectory.mail` and `.userPrincipalName`). Adjust `MicrosoftActiveDirectory` to the name of the Active Directory target system in the customer's HelloID environment.
 
 > [!NOTE]
 > **Department and Title:** `Department` and `Title` contain the department and title codes as used in Smile (mapped from `Department.ExternalId` and `Title.ExternalId`). Customer-specific changes to the mapping are made during the implementation, not in this connector.

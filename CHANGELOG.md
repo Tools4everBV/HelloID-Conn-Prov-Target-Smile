@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
 
-## [2.0.0] - 2026-06-10
+## [2.0.0] - 2026-11-18
 
 ### Added
 
@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file. The format 
 - Changed Title mapping to use Title.ExternalId (job title code) instead of Title.Name
 - Changed EmployeeNumber mapping to Create only (was Create and Update), with a caution in the field description and README
 - Resource creation for departments and titles now uses its own webhook key (new optional settings DepartmentWebhookGUID and TitleWebhookGUID) instead of the employee WebhookGUID; enter the same value when one webhook is used
+- TenantGUID is now optional; the tenant part is left out of the webhook URL when it is empty
+- Replaced the hardcoded Active Directory target system GUID in the Email and Username mapping with the placeholder Person.Accounts.MicrosoftActiveDirectory, to be adjusted per customer
 - Simplified Resolve-SmileError (the webhook returns no error details) and removed unused response variables in all scripts
 - Restructured the README to the current Tools4ever connector layout (warning block, feature legend, behavior per action, script conventions)
 - Shortened the script header notes and moved the Smile webhook explanation to the README
