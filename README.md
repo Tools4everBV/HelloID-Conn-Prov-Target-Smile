@@ -116,14 +116,21 @@ Before configuring the connector in HelloID, the following steps must be complet
 
 ### Connection settings
 
-The following settings are required to connect to the API.
+The connector builds the webhook URL from the settings below:
 
-| Setting      | Description                      | Mandatory | Example                              |
-| ------------ | -------------------------------- | --------- | ------------------------------------ |
-| BaseUrl      | The URL to the Smile environment | Yes       | https://example.smilesaas.eu         |
-| EnvGUID      | The Environment GUID             | Yes       | 12345678-1234-1234-1234-123456789abc |
-| WebhookGUID  | The Webhook GUID                 | Yes       | 12345678-1234-1234-1234-123456789abc |
-| TenantGUID   | The Tenant GUID                  | Yes*      | 12345678-1234-1234-1234-123456789abc |
+```
+{BaseUrl}/api/webhook/{EnvGUID}/employee/{WebhookGUID}/{TenantGUID}
+```
+
+| Setting      | Description                      | Mandatory | Where to find it                                                  |
+| ------------ | -------------------------------- | --------- | ----------------------------------------------------------------- |
+| BaseUrl      | The URL to the Smile environment | Yes       | Start of the webhook URL, without path (e.g. https://example.kader-platform.nl) |
+| EnvGUID      | The Environment GUID             | Yes       | Part of the URL between `/api/webhook/` and `/employee/`          |
+| WebhookGUID  | The Webhook GUID                 | Yes       | API key of the Employee (Medewerker) webhook in Smile            |
+| TenantGUID   | The Tenant GUID                  | Yes*      | Last part of the employee webhook URL, after the WebhookGUID      |
+
+> [!NOTE]
+> Only the Employee webhook is used by the account lifecycle. The API keys of the Department and Title webhooks are only needed when resource creation is used.
 
 > [!NOTE]
 > *TenantGUID is only relevant for multi-tenant Smile environments. For single-tenant implementations, this GUID is included in the URL pattern but may not be actively used for authentication.

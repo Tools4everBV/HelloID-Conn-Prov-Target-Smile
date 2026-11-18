@@ -5,7 +5,7 @@
     "defaultValue": "",
     "templateOptions": {
       "label": "BaseUrl",
-      "description": "The URL to the API.",
+      "description": "Smile URL without path, e.g. https://example.kader-platform.nl",
       "required": true
     }
   },
@@ -16,7 +16,7 @@
     "templateOptions": {
       "type": "password",
       "label": "EnvGUID",
-      "description": "The EnvGUID to connect to the API",
+      "description": "The part of the webhook URL between /api/webhook/ and /employee/",
       "required": true
     }
   },
@@ -27,7 +27,7 @@
     "templateOptions": {
       "type": "password",
       "label": "WebhookGUID",
-      "description": "The WebhookGUID to connect to the API",
+      "description": "The API key of the Employee (Medewerker) webhook in Smile",
       "required": true
     }
   },
@@ -38,7 +38,7 @@
     "templateOptions": {
       "type": "password",
       "label": "TenantGUID",
-      "description": "The TenantGUID to connect to the API",
+      "description": "The last part of the employee webhook URL, after the WebhookGUID",
       "required": true
     }
   }
