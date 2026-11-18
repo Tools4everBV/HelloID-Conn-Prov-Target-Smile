@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file. The format 
 - Added the database ID that Smile returns to the audit logs of all actions (information only, not stored and not used as AccountReference)
 - Added standard field mapping file (fieldMapping.json) with commonly used fields
 - Added comprehensive setup documentation in README including Smile configuration steps
-- Added development resources section with webhook endpoint documentation
+- Added development resources section with API endpoint documentation
 - Added detailed remarks about EmployeeNumber handling, delete action behavior, and testing procedures
 
 ### Changed

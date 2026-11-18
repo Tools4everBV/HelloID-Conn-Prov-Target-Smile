@@ -44,7 +44,7 @@
     - [Delete behavior](#delete-behavior)
     - [Testing JSON before go-live](#testing-json-before-go-live)
   - [Development resources](#development-resources)
-    - [Webhook endpoints](#webhook-endpoints)
+    - [API endpoints](#api-endpoints)
     - [API documentation](#api-documentation)
     - [Script conventions](#script-conventions)
   - [Getting help](#getting-help)
@@ -253,7 +253,7 @@ This helps ensure the import template is correctly configured before the webhook
 
 ## Development resources
 
-### Webhook endpoints
+### API endpoints
 
 All webhooks use the same URL pattern; only the webhook key differs per webhook (employee, department, title):
 
